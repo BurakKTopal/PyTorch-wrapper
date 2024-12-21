@@ -1,7 +1,5 @@
-import torch.nn as nn
 from helpers import loading_data
 from wrappers.ExtendedPytorchWrapper import ExtendedPytorchWrapper
-from wrappers.BasePytorchWrapper import NetworkType
 from wrappers.BasePytorchWrapper import BasePytorchWrapper
 from config import *
 

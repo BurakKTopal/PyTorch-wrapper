@@ -40,7 +40,6 @@ class BasePytorchWrapper():
     def transform_image_data(X, Y, NN_type):
         match NN_type:
             case NetworkType.FNN:
-                print(f"Transforming image data to FNN format {X.shape[0]}")
                 X = X.reshape(X.shape[0], -1) # We feed the image as a vector
             case NetworkType.CNN:
                 X = X.unsqueeze(1) # For (mini-)batch processing
@@ -130,7 +129,7 @@ class BasePytorchWrapper():
     def train_network_in_epoch(self):
         # Training network
         self.pyTorch_network.train()
-        for inputs, targets in self.loader:
+        for inputs, targets in iter(self.loader):
             self.optimizer.zero_grad()
             outputs = self.pyTorch_network(inputs)
             loss = self.loss_function(outputs, targets)
@@ -159,7 +158,7 @@ class BasePytorchWrapper():
         """
         Training the network within the frame of the assignment. Mostly adapted from the examples as given by the lecturers.
         """
-        for epoch in range(1, self.epochs + 1):
+        for epoch in range(0, self.epochs-1):
             self.train_network_in_epoch()
             
             if plot:  # Only plotting if wishing too
@@ -181,14 +180,6 @@ class BasePytorchWrapper():
             
         # Plot 1: Losses
         ax.set_yscale('log')
-        ax.plot(
-            np.arange(len(self.batch_L2)) * self.batch_size / len(self.train_data), 
-            self.batch_L2, 
-            ".", 
-            markersize=1.0, 
-            label="batch loss", 
-            markerfacecolor=(0, 0, 1, 0.3)
-        )
         ax.plot(self.train_L2, label="training loss")
         ax.plot(self.test_L2, label="testing loss")
         ax.legend()

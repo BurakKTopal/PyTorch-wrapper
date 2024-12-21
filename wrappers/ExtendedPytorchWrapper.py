@@ -65,14 +65,6 @@ class ExtendedPytorchWrapper(BasePytorchWrapper):
         # Figure 1: Losses
         fig1, ax1 = plt.subplots(figsize=(10, 4))
         ax1.set_yscale('log')
-        ax1.plot(
-            np.arange(len(self.batch_L2)) * self.batch_size / len(self.train_data), 
-            self.batch_L2, 
-            ".", 
-            markersize=1.0, 
-            label="batch loss", 
-            markerfacecolor=(0, 0, 1, 0.3)
-        )
         ax1.plot(self.train_L2, label="training loss")
         ax1.plot(self.test_L2, label="testing loss")
         ax1.legend()

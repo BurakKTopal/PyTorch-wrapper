@@ -8,7 +8,7 @@ Config file containing setup for the training and network configuration
 """
 
 # Training hyperparameters
-EPOCHS = 10
+EPOCHS = 20
 BATCH_SIZE = 32
 LEARNING_RATE = 0.001
 

@@ -37,6 +37,12 @@ All network and training parameters can be configured in `config.py`. This inclu
 
 There are two classes: the BasePytorchWrapper and the ExtendedPytorchWrapper. The first one includes the essential elements to accurately design and evaluate a neural network. The second one has additional features such as displaying the CPU cycles, tracking the evolution of accuracy, and setting a seed. The latter is particularly useful if you want to reproduce results and ensure consistency between different training runs.
 
+
+## Output Example
+![Output Example](media/output_example.png)
+*Example output showing loss metrics during training*
+
+
 # Installation
 
 ### Requirements
