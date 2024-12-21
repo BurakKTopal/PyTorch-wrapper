@@ -8,7 +8,7 @@ from IPython.display import clear_output
 from wrappers.BasePytorchWrapper import BasePytorchWrapper
 
 class ExtendedPytorchWrapper(BasePytorchWrapper):
-    def __init__(self, X, Y,  seed=None):
+    def __init__(self, X, Y, seed=None):
         self.generator = None
         if seed is not None:
             self.seed = seed
@@ -67,6 +67,8 @@ class ExtendedPytorchWrapper(BasePytorchWrapper):
         ax1.set_yscale('log')
         ax1.plot(self.train_L2, label="training loss")
         ax1.plot(self.test_L2, label="testing loss")
+        ax1.set_xlabel('Epoch')
+        ax1.set_ylabel('Loss')
         ax1.legend()
         ax1.set_title('Loss Metrics')
         x_anchor = 0.5 * ax1.get_xlim()[0] + 0.5 * ax1.get_xlim()[1]

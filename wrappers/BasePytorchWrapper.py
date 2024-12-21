@@ -111,11 +111,10 @@ class BasePytorchWrapper():
         for index in range(len(Ytest)):
             self.pyTorch_network.eval() 
             y_test = torch.argmax(Ytest[index])
-            y_pred = torch.argmax(self.pyTorch_network(Xtest[index]))
+            y_pred = torch.argmax(self.predict(Xtest[index]))
             if y_test == y_pred:
                 correct +=1
         return round(correct/len(Ytest),2)*100
-    
 
     def upload_pyTorch_network(self, network):
         """
@@ -129,9 +128,9 @@ class BasePytorchWrapper():
     def train_network_in_epoch(self):
         # Training network
         self.pyTorch_network.train()
-        for inputs, targets in iter(self.loader):
+        for inputs, targets in self.loader:
             self.optimizer.zero_grad()
-            outputs = self.pyTorch_network(inputs)
+            outputs = self.predict(inputs)
             loss = self.loss_function(outputs, targets)
             self.batch_L2.append(loss.item() / self.batch_size)
             loss.backward()
@@ -146,14 +145,12 @@ class BasePytorchWrapper():
 
         # Evaluate the model on the test data
         test_inputs, test_targets = self.test_data[:]
-        test_outputs = self.pyTorch_network(test_inputs)
+        test_outputs = self.predict(test_inputs)
 
         # Compute the average test loss
         average_test_loss = self.loss_function(test_outputs, test_targets) / len(self.test_data)
         self.test_L2.append(average_test_loss.item())
             
-
-
     def train_network(self, plot=False):
         """
         Training the network within the frame of the assignment. Mostly adapted from the examples as given by the lecturers.
@@ -192,6 +189,9 @@ class BasePytorchWrapper():
     
         plt.tight_layout()
         plt.show()
+    
+    def predict(self, x):
+        return self.pyTorch_network(x)
     
     def reset_training(self):
         """
