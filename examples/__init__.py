@@ -1,0 +1,3 @@
+from examples.CNN_example_run import CNN_example_run
+from examples.FNN_example_run import FNN_example_run
+from examples.load_example_dataset import load_language_digit_example_dataset
