@@ -1,11 +1,9 @@
-from utils.NN_generators import  FNNGenerator
-from wrappers.network_types import NetworkType
-from examples.xNN_example_run import xNN_example_run
-from utils.NN_generators import set_seed
+from simple_pytorch_wrapper.utils.NN_generators import  FNNGenerator
+from simple_pytorch_wrapper.utils.network_types import NetworkType
+from simple_pytorch_wrapper.examples.xNN_example_run import xNN_example_run
 import torch.nn as nn
 
-def FNN_example_run(learning_rate, batch_size, epochs, plot):
-    set_seed(42)
+def FNN_example_run(learning_rate, batch_size, epochs, plot, seed=None):
     # Generating network
     network = FNNGenerator(
     input_size=64*64,  # flattened value of image
@@ -14,5 +12,5 @@ def FNN_example_run(learning_rate, batch_size, epochs, plot):
     hidden_activations=[nn.ReLU(), nn.ReLU()],  # activation functions for each hidden layer
     )
     network_type = NetworkType.FNN
-    xNN_example_run(learning_rate, batch_size, epochs, plot, network, network_type)
+    xNN_example_run(learning_rate, batch_size, epochs, plot, network, network_type, seed)
     return

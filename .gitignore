@@ -5,3 +5,9 @@ __pycache__/
 
 # Virtual env
 .venv
+
+# Package-related
+build/
+dist/
+simple_pytorch_wrapper.egg-info/
+test/

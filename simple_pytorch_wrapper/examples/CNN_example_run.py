@@ -1,10 +1,10 @@
-from utils.NN_generators import  CNNGenerator
-from examples.xNN_example_run import xNN_example_run
-from wrappers.network_types import NetworkType
-from utils.NN_generators import set_seed
+from simple_pytorch_wrapper.utils.NN_generators import  CNNGenerator
+from simple_pytorch_wrapper.examples.xNN_example_run import xNN_example_run
+from simple_pytorch_wrapper.utils.network_types import NetworkType
+
 
 def CNN_example_run(learning_rate, batch_size, epochs, plot):
-    # set_seed(42)
+    
     network = CNNGenerator(
     input_channels=1,
     conv_layers=[{

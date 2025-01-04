@@ -1,13 +1,14 @@
 import math
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 from IPython.display import clear_output
-from wrappers.network_types import NetworkType
+from simple_pytorch_wrapper.utils.network_types import NetworkType
 
 
-class BasePytorchWrapper():
+class PytorchWrapper():
     """
     This class serves as a wrapper for the general structure for the digit recoginition assignment.
     By the use of upload_pyTorch_network(), which provides a 'gateway' to setup any neural network and train it with abstracted commands
@@ -31,6 +32,8 @@ class BasePytorchWrapper():
         self.train_L2 = []
         self.test_L2 = []
         self.pyTorch_network = None
+        self.l_accuracy = []
+        self.cpu_cycles = []
 
     @staticmethod
     def vectorize_data(X, Y, NN_type):
@@ -74,7 +77,7 @@ class BasePytorchWrapper():
         else:
             raise ValueError("Unsupported loss function. Please use 'LSE' or 'CrossEntropy'.")
         return
-        
+    
     def _handle_plot(self, curr_epoch, plot):
             print(f"Progress: {round(curr_epoch/self.epochs, 2)*100}%")
             if plot and (curr_epoch % max(2, self.epochs // 10) == 0):  # Only plotting if wishing to, and at most 10 times
@@ -160,32 +163,65 @@ class BasePytorchWrapper():
         """
         Training the network within the frame of the assignment. Mostly adapted from the examples as given by the lecturers.
         """
-        for epoch in range(1, self.epochs):
-            self.train_network_in_epoch()
-            self._handle_plot(epoch, plot)
+        for epoch in range(1, self.epochs+1):
+            start_cpu_time = time.process_time() * 1000
 
+            self.train_network_in_epoch()
+
+            end_cpu_time = time.process_time() * 1000
+            self.cpu_cycles.append(end_cpu_time - start_cpu_time)
+            self.l_accuracy.append(self.calculate_accuracy())
+
+            self._handle_plot(epoch, plot)
+        return
+    
     def visualize(self):
         """
-        Visualization with three subplots showing:
+        Visualization with three separate figures showing:
         1. Loss metrics (batch, training, and testing loss)
         2. Accuracy over epochs
         3. CPU cycle time per epoch
         """
         clear_output(wait=True)
-        fig, ax = plt.subplots(1, 1, figsize=(10, 12))
-            
-        # Plot 1: Losses
-        ax.set_yscale('log')
-        ax.plot(self.train_L2, label="training loss")
-        ax.plot(self.test_L2, label="testing loss")
-        ax.legend()
-        ax.set_title('Loss Metrics')
         
-        # Add text for test loss
-        x_anchor = 0.5 * ax.get_xlim()[0] + 0.5 * ax.get_xlim()[1]
-        y_anchor = 10**(0.2*math.log10(ax.get_ylim()[0]) + 0.8*math.log10(ax.get_ylim()[1]))
-        ax.text(x_anchor, y_anchor, f"Test loss: {self.test_L2[-1]:.2e}", ha='center', fontsize=12)
-    
+        # Figure 1: Losses
+        fig1, ax1 = plt.subplots(figsize=(10, 4))
+        ax1.set_yscale('log')
+        ax1.plot(self.train_L2, label="training loss")
+        ax1.plot(self.test_L2, label="testing loss")
+        ax1.set_xlabel('Epoch')
+        ax1.set_ylabel('Loss')
+        ax1.legend()
+        ax1.set_title('Loss Metrics')
+        x_anchor = 0.5 * ax1.get_xlim()[0] + 0.5 * ax1.get_xlim()[1]
+        y_anchor = 10**(0.2*math.log10(ax1.get_ylim()[0]) + 0.8*math.log10(ax1.get_ylim()[1]))
+        ax1.text(x_anchor, y_anchor, f"Test loss: {self.test_L2[-1]:.2e}", ha='center', fontsize=12)
+        plt.tight_layout()
+        plt.show()
+        
+        # Figure 2: Accuracy
+        fig2, ax2 = plt.subplots(figsize=(10, 4))
+        ax2.plot(self.l_accuracy, 'g-', label='Accuracy')
+        ax2.set_title('Accuracy over Epochs')
+        ax2.set_ylabel('Accuracy (%)')
+        ax2.set_xlabel('Epoch')
+        ax2.grid(True)
+        if self.l_accuracy:  # Only add text if we have accuracy data
+            ax2.text(0.02, 0.95, f"Current accuracy: {self.l_accuracy[-1]:.2f}%", 
+                     transform=ax2.transAxes, fontsize=12)
+        plt.tight_layout()
+        plt.show()
+        
+        # Figure 3: CPU Cycles
+        fig3, ax3 = plt.subplots(figsize=(10, 4))
+        ax3.plot(self.cpu_cycles, 'r-', label='CPU Cycles')
+        ax3.set_title('CPU Cycles per Epoch')
+        ax3.set_ylabel('CPU Cycles (ms)')
+        ax3.set_xlabel('Epoch')
+        ax3.grid(True)
+        if self.cpu_cycles:  # Only add text if we have CPU cycle data
+            ax3.text(0.02, 0.95, f"Last epoch cycles: {self.cpu_cycles[-1]:,} ms", 
+                     transform=ax3.transAxes, fontsize=12)
         plt.tight_layout()
         plt.show()
     
@@ -202,3 +238,5 @@ class BasePytorchWrapper():
         self.reset_pyTorch_network_params()
         self.optimizer = None
         self.loader = None
+        self.l_accuracy = []
+        self.cpu_cycles = []

@@ -1,16 +1,16 @@
-from  examples.load_example_dataset import load_language_digit_example_dataset
-from wrappers.extended_pytorch_wrapper import ExtendedPytorchWrapper
+from simple_pytorch_wrapper.examples.load_example_dataset import load_language_digit_example_dataset
+from simple_pytorch_wrapper.wrapper.pytorch_wrapper import PytorchWrapper
 
-def xNN_example_run(learning_rate, batch_size, epochs, plot, network, network_type):
+def xNN_example_run(learning_rate, batch_size, epochs, plot, network, network_type, seed=None):
 
     # Upload data
     X, Y = load_language_digit_example_dataset()
 
     # Transform data accordingly (vectorizing) + squeezing for batching
-    X, Y = ExtendedPytorchWrapper.vectorize_data(X, Y, network_type) # Needed to transform the data to the correct format for the input
+    X, Y = PytorchWrapper.vectorize_data(X, Y, network_type) # Needed to transform the data to the correct format for the input
 
     # Extended wrapper
-    wrapper = ExtendedPytorchWrapper(X, Y, seed=42)  # Using the extended wrapper with a seed
+    wrapper = PytorchWrapper(X, Y)  # Using the extended wrapper with a seed
     
     wrapper.upload_pyTorch_network(network) # CNN network is also possible
 
@@ -25,5 +25,6 @@ def xNN_example_run(learning_rate, batch_size, epochs, plot, network, network_ty
     # Evaluating accuracy
     accuracy = wrapper.calculate_accuracy()
     print(f"The final accuracy is: {accuracy}%")
+    
     return
 

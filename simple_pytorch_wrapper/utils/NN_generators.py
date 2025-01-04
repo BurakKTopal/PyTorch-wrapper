@@ -4,43 +4,58 @@ import torch.nn.functional as F
 import numpy as np
 
 
-def set_seed(seed_value):
-    torch.manual_seed(seed_value)  # PyTorch RNG
-
-def FNNGenerator(input_size, output_size, hidden_layers, hidden_activations = None):
+class FNNGenerator(nn.Module):
     """
-    Generates a PyTorch neural network with specified hidden layers, widths, and activation functions.
+    A customizable feedforward neural network generator.
     """
-    if not hidden_activations:
-        # Relu is default
-        hidden_activations = [nn.ReLU() for _ in range(hidden_layers)]
-    if len(hidden_layers) != len(hidden_activations):
-        raise ValueError("The length of hidden_layers and hidden_activations must be the same.")
+    def __init__(self, input_size, output_size, hidden_layers, hidden_activations=None):
+        """
+        Initializes the feedforward neural network.
 
-    layers = []
-    
-    # Input to the first hidden layer
-    current_input_size = input_size
-    for hidden_units, activation in zip(hidden_layers, hidden_activations):
-        layers.append(nn.Linear(current_input_size, hidden_units))
-        if activation:
-            layers.append(activation)
-        current_input_size = hidden_units
-    
-    # Final layer (hidden to output)
-    layers.append(nn.Linear(current_input_size, output_size))
-    
-    # Create the Sequential model
-    network = nn.Sequential(*layers)
-    
-    return network
+        Args:
+            input_size (int): Number of input features.
+            output_size (int): Number of output features.
+            hidden_layers (list of int): List of integers specifying the number of units in each hidden layer.
+            hidden_activations (list of nn.Module or None): List of activation functions for each hidden layer.
+                                                            Defaults to ReLU for all layers if None.
+        """
+        super(FNNGenerator, self).__init__()
+
+        if not hidden_activations:
+            # Default activation is ReLU for all hidden layers
+            hidden_activations = [nn.ReLU() for _ in hidden_layers]
+
+        if len(hidden_layers) != len(hidden_activations):
+            raise ValueError("The length of hidden_layers and hidden_activations must be the same.")
+
+        # Create layers
+        layers = []
+        current_input_size = input_size
+
+        for hidden_units, activation in zip(hidden_layers, hidden_activations):
+            layers.append(nn.Linear(current_input_size, hidden_units))  # Add linear layer
+            if activation:
+                layers.append(activation)  # Add activation layer
+            current_input_size = hidden_units
+
+        # Add the final output layer
+        layers.append(nn.Linear(current_input_size, output_size))
+
+        # Combine all layers into a Sequential model
+        self.network = nn.Sequential(*layers)
+
+    def forward(self, x):
+        """
+        Defines the forward pass of the network.
+        """
+        return self.network(x)
 
 class CNNGenerator(nn.Module):
     """
     Dynamic CNN class to construct convolutional layers and fully connected layers
     based on input configurations.
     """
-    def __init__(self, input_channels, conv_layers, fc_layers, output_size, batch_size, use_pooling=False):
+    def __init__(self, input_channels, conv_layers, fc_layers, output_size, batch_size, seed=None, use_pooling=False):
         """
         Arguments:
             input_channels (int): Number of input channels
@@ -53,6 +68,8 @@ class CNNGenerator(nn.Module):
             use_pooling (bool): Whether to use MaxPool2d after each conv layer
         """
         super(CNNGenerator, self).__init__()
+        if not seed:   
+            Warning("You have not chosen a seed, the CNN network will be initialized randomly.")
         self.batch_size = batch_size
         self.use_pooling = use_pooling
         self.flattened_size_per_element_in_batch = None
