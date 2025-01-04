@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 from IPython.display import clear_output
-
+import os
 from wrappers.base_pytorch_wrapper import BasePytorchWrapper
 
 class ExtendedPytorchWrapper(BasePytorchWrapper):
@@ -13,34 +13,47 @@ class ExtendedPytorchWrapper(BasePytorchWrapper):
         if seed is not None:
             self.seed = seed
             self.set_seed()
+
         super().__init__(X, Y) # First need to setup the seed before continue
 
         self.l_accuracy = []
         self.cpu_cycles = []
 
     def set_seed(self):
+        return
         torch.manual_seed(self.seed)
         torch.cuda.manual_seed(self.seed)
         np.random.seed(self.seed)
         self.generator = torch.Generator()
         self.generator.manual_seed(self.seed)
+        torch.backends.cudnn.deterministic=True
+        torch.backends.cudnn.benchmark=False
 
     def setup_training(self, batch_size, learning_rate, epochs, loss_function='LSE',  reset_training=True):
         super().setup_training(batch_size, learning_rate, epochs, loss_function, reset_training)
         # Override only the loader to use the generator
         self.loader = torch.utils.data.DataLoader(self.train_data, batch_size=batch_size, shuffle=True, generator=self.generator)
 
-    def generate_train_and_test(self, X, Y):
+    def _generate_train_and_test(self, X, Y):
         dataset = torch.utils.data.TensorDataset(X, Y)
         train_size = int(0.8 * len(dataset))
         test_size = len(dataset) - train_size
-        self.train_data, self.test_data = torch.utils.data.random_split(dataset, [train_size, test_size], generator=self.generator)
+        self.train_data, self.test_data = torch.utils.data.random_split(dataset, [train_size, test_size], 
+                                                                        generator=self.generator)
+        
+        for i, (data, target) in enumerate(self.train_data):
+            print(f"Sample {i}:")
+            print(f"Data: {data}")
+            print(f"Target: {target}")
+            print("-" * 20)
+            if i==10:
+                break
         return self.train_data, self.test_data
 
     def train_network(self, plot=False):
         for epoch in range(1, self.epochs + 1):
             start_cpu_time = time.process_time() * 1000
-            
+            self.set_seed()
             super().train_network_in_epoch()
 
             end_cpu_time = time.process_time() * 1000

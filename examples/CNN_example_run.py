@@ -1,8 +1,10 @@
 from utils.NN_generators import  CNNGenerator
-from examples.xNN_example_run import x_NN_example_run
+from examples.xNN_example_run import xNN_example_run
 from wrappers.network_types import NetworkType
-def CNN_example_run(learning_rate, batch_size, epochs, plot):
+from utils.NN_generators import set_seed
 
+def CNN_example_run(learning_rate, batch_size, epochs, plot):
+    # set_seed(42)
     network = CNNGenerator(
     input_channels=1,
     conv_layers=[{
@@ -17,5 +19,5 @@ def CNN_example_run(learning_rate, batch_size, epochs, plot):
     use_pooling=False
     )
     network_type = NetworkType.CNN
-    x_NN_example_run(learning_rate, batch_size, epochs, plot, network, network_type)
+    xNN_example_run(learning_rate, batch_size, epochs, plot, network, network_type)
     return

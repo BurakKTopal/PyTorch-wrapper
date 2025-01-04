@@ -1,7 +1,11 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
 
+
+def set_seed(seed_value):
+    torch.manual_seed(seed_value)  # PyTorch RNG
 
 def FNNGenerator(input_size, output_size, hidden_layers, hidden_activations = None):
     """

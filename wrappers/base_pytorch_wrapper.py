@@ -74,7 +74,7 @@ class BasePytorchWrapper():
         else:
             raise ValueError("Unsupported loss function. Please use 'LSE' or 'CrossEntropy'.")
         return
-    
+        
     def _handle_plot(self, curr_epoch, plot):
             print(f"Progress: {round(curr_epoch/self.epochs, 2)*100}%")
             if plot and (curr_epoch % max(2, self.epochs // 10) == 0):  # Only plotting if wishing to, and at most 10 times
@@ -94,7 +94,7 @@ class BasePytorchWrapper():
         test_size = len(dataset) - train_size
 
         # Generating test and train set according to proportions
-        self.train_data, self.test_data = torch.utils.data.random_split(dataset, [train_size, test_size], generator=self.generator)
+        self.train_data, self.test_data = torch.utils.data.random_split(dataset, [train_size, test_size])
         return self.train_data, self.test_data
     
     def reset_pyTorch_network_params(self):

@@ -1,8 +1,7 @@
 from  examples.load_example_dataset import load_language_digit_example_dataset
 from wrappers.extended_pytorch_wrapper import ExtendedPytorchWrapper
-from wrappers.network_types import NetworkType
 
-def x_NN_example_run(learning_rate, batch_size, epochs, plot, network, network_type):
+def xNN_example_run(learning_rate, batch_size, epochs, plot, network, network_type):
 
     # Upload data
     X, Y = load_language_digit_example_dataset()
