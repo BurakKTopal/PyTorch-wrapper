@@ -4,7 +4,7 @@ A lightweight PyTorch wrapper for fast and easy neural network training and eval
 """
 
 # Metadata
-__version__ = "0.0.1"
+__version__ = "0.0.3"
 __author__ = "Burakktopal"
 __description__ = "A lightweight PyTorch wrapper for fast and easy neural network training and evaluation."
 
@@ -20,6 +20,7 @@ from .utils import (
     CNNGenerator,
     load_data_from_numpy_files,
     NetworkType,
+    display_warning
 )
 from .wrapper import PytorchWrapper
 
@@ -36,7 +37,8 @@ __all__ = [
     "CNNGenerator",
     "load_data_from_numpy_files",
     "NetworkType",
-    
+    "display_warning"
+
     # Wrapper
     "PytorchWrapper",
 ]

@@ -4,7 +4,6 @@ from simple_pytorch_wrapper.utils.network_types import NetworkType
 
 
 def CNN_example_run(learning_rate, batch_size, epochs, plot):
-    
     network = CNNGenerator(
     input_channels=1,
     conv_layers=[{

@@ -20,31 +20,32 @@ def main():
     # Example data
     X, Y = load_language_digit_example_dataset()
 
-    # Transform data accordingly (vectorizing) + squeezing for batching
-    X, Y = PytorchWrapper.vectorize_data(X, Y, NetworkType.FNN) 
+    # Transform shape of *image* data accordingly
+    X, Y = PytorchWrapper.vectorize_image_data(X, Y, NetworkType.FNN) 
 
     # Pytorch wrapper
-    wrapper = PytorchWrapper(X, Y)  
+    wrapper = PytorchWrapper(X, Y, classification=True) 
     
+    # Generate a feedforward neural network
     network = FNNGenerator(
-    input_size=64*64,  # flattened value of image of example dataset
-    output_size=10,    # number of outputs
-    hidden_layers=[100, 500],  # sizes of hidden layers
-    hidden_activations=[nn.ReLU(), nn.ReLU()],  # activation functions for each hidden layer
+    input_size=64*64,  
+    output_size=10,   
+    hidden_layers=[100, 500],  
+    hidden_activations=[nn.ReLU(), nn.ReLU()]
     )
     
-    # Create custom pytorch network
+    # Upload python network to wrapper
     wrapper.upload_pyTorch_network(network) 
 
-    wrapper.setup_training(batch_size=32, learning_rate=0.001, epochs=10) 
-
     # Training
-    wrapper.train_network(plot=False)  # Enable plotting periodically during training
+    wrapper.setup_training(batch_size=32, learning_rate=0.001, epochs=10)
+    wrapper.train_network(plot=False)
 
-    # Visualization
+    # Visuals
     wrapper.visualize()
 
-main()
+if __name__ == "__main__":
+    main()
 ```
 You see that training a network from start to finish, with a clean visualization in less than 15 effective lines!
 

@@ -4,17 +4,17 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="simple_pytorch_wrapper",  # Use snake_case if renaming the package
-    version="0.0.2",
+    name="simple_pytorch_wrapper", 
+    version="0.0.3",
     author="Burakktopal",
     description="A lightweight PyTorch wrapper for fast and easy neural network training and evaluation.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/burakktopal/pytorch-wrapper-package",
     packages=find_packages(include=["simple_pytorch_wrapper", "simple_pytorch_wrapper.*"]),
-    include_package_data=True,  # Ensures non-Python files are included
+    include_package_data=True,  
     package_data={
-        "simple_pytorch_wrapper.examples": ["data/*.npy"],  # Adjust based on the new structure
+        "simple_pytorch_wrapper.examples": ["data/*.npy"], 
     },
     classifiers=[
         "Programming Language :: Python :: 3",

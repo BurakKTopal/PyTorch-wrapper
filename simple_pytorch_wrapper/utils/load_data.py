@@ -1,8 +1,10 @@
 import torch
 import numpy as np
 
-# Loading data function:
 def load_data_from_numpy_files(folder_name):
+    """
+    Load data from numpy files.
+    """
     np_X = np.load(f"{folder_name}/X.npy")
     np_Y = np.load(f"{folder_name}/Y.npy")
     X = torch.from_numpy(np_X) 

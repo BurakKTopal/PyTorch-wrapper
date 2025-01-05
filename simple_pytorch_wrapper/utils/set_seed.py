@@ -1,9 +1,10 @@
 import random
 import numpy as np
 import torch
+from simple_pytorch_wrapper.utils.display_warning import display_warning
 
 def set_seed(seed):
-    Warning("To ensure reproducibility, set_seed() has to be first called, before any other function call is made.")
+    display_warning("set_seed()", "To ensure reproducibility, be sure to call set_seed() before you generate your pytorch network.")
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
