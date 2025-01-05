@@ -11,3 +11,8 @@ build/
 dist/
 simple_pytorch_wrapper.egg-info/
 test/
+
+# release
+.pypirc
+upload_pipeline.txt
+main.py

@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="simple_pytorch_wrapper",  # Use snake_case if renaming the package
-    version="0.0.1",
+    version="0.0.2",
     author="Burakktopal",
     description="A lightweight PyTorch wrapper for fast and easy neural network training and evaluation.",
     long_description=long_description,
