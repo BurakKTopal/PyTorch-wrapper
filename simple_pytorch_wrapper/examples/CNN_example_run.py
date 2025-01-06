@@ -15,6 +15,8 @@ def CNN_example_run(learning_rate, batch_size, epochs, plot):
     fc_layers=[500],
     output_size=10,
     batch_size=batch_size,
+    image_height=64,
+    image_width=64,
     use_pooling=False
     )
     network_type = NetworkType.CNN

@@ -50,7 +50,7 @@ if __name__ == "__main__":
 You see that training a network from start to finish, with a clean visualization in less than 15 effective lines!
 
 ## Upload your own network!
-The `network` variable above is there to be defined by you. This is aimed to take in any Neural network design. The only caveat is to correctly shape your input. For a feedforward and CNN, these are already implemented by the `vectorize_data(*args)` function. 
+The `network` variable above is there to be defined by you. This is aimed to take in any Neural network design. The only caveat is to correctly shape your input. In case of image analysis, this is already implemented for a feedforward and CNN, these are already implemented by the `vectorize_image_data(*args)` function. If you already have correctly formatted your image_data, then this static function call is not necessary. 
 
 To get you started on the networks, there has been provided already NN generator classes for a feed-forward NN and a convolutional one. These can be used respectively by calling `FNNGenerator(*args)` and `CNNGenerator(*args)`. 
 
@@ -65,13 +65,19 @@ network = FNNGenerator(input_size: int,
 
 While for the `CNNGenerator`, this is: 
 ```python 
-network = CNNGenerator(input_channels: int,
-                      conv_layers: List[Dict[str, int]],  
-                      fc_layers: List[int], 
-                      output_size: int,
-                      batch_size: Optional[int] = None,
-                      use_pooling: bool = True)
+network = CNNGenerator(
+                input_channels: int,
+                conv_layers: List[Dict[str, int]],  
+                fc_layers: List[int], 
+                output_size: int,
+                batch_size: int,
+                image_height: int, 
+                image_width: int,
+                seed: Optional[int] = None,
+                use_pooling: bool = False
+            )
 ```
+The ´image_height´ and ´image_width´ are necessary to get the dimensionality of the forward layers in the CNN right.
 
 ## Example runs
 It can be hard to know the power of a tool, without having a solid example. By calling `FNN_example_run()` with the training params as function arguments, you get a run on the example data set for a FNN architecture. The `CNN_example_run()` does it with a CNN architecture.

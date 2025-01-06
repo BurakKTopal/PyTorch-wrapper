@@ -50,28 +50,31 @@ class CNNGenerator(nn.Module):
     Dynamic CNN class to construct convolutional layers and fully connected layers
     based on input configurations.
     """
-    def __init__(self, input_channels, conv_layers, fc_layers, output_size, batch_size, seed=None, use_pooling=False):
+    def __init__(self, input_channels, conv_layers, fc_layers, output_size, batch_size, image_height, image_width, seed=None, use_pooling=False):
         """
         Arguments:
-            input_channels (int): Number of input channels
+            input_channels (int): Number of input channels.
             conv_layers (list of dict): List of dictionaries specifying conv layer configurations.
                                       Each dict should contain keys: `out_channels`, `kernel_size`, 
                                       `stride`, and `padding`.
             fc_layers (list of int): List specifying the number of neurons in each fully connected layer.
             output_size (int): Number of output classes for the final layer.
-            batch_size: the size of the used batch so that neural network can process one batch at once.
-            use_pooling (bool): Whether to use MaxPool2d after each conv layer
+            batch_size (int): The size of the batch to be processed at once.
+            image_height (int): Height of the input image.
+            image_width (int): Width of the input image.
+            seed (int, optional): Random seed for reproducibility.
+            use_pooling (bool): Whether to use MaxPool2d after each conv layer. The kernel size is fixed at (2, 2).
         """
         super(CNNGenerator, self).__init__()
+        
         if not seed:
-            display_warning("__init__() CNNGenerator","You have not chosen a seed, the CNN network will be initialized randomly.")
+            display_warning("__init__() CNNGenerator", "You have not chosen a seed, the CNN network will be initialized randomly.")
         self.batch_size = batch_size
         self.use_pooling = use_pooling
         self.flattened_size_per_element_in_batch = None
         
         self.conv_layers = nn.ModuleList()
         in_channels = input_channels
-        print(input_channels, conv_layers, fc_layers, output_size, batch_size)
         
         for conv in conv_layers:
             self.conv_layers.append(
@@ -87,7 +90,7 @@ class CNNGenerator(nn.Module):
         
         self.pool = nn.MaxPool2d(kernel_size=(2, 2)) if use_pooling else None
         
-        dummy_input = torch.zeros(batch_size, input_channels, 64, 64)
+        dummy_input = torch.zeros(batch_size, input_channels, image_height, image_width)
         with torch.no_grad():
             x = dummy_input
             for conv in self.conv_layers:
@@ -96,14 +99,13 @@ class CNNGenerator(nn.Module):
                     x = self.pool(x)
                     
             if (x.numel() % batch_size != 0):
-                raise ValueError("the number of inputs must be multiple of batch size")
-            self.flattened_size_per_element_in_batch = x.numel()//batch_size
-            
+                raise ValueError("The number of inputs must be a multiple of the batch size.")
+            self.flattened_size_per_element_in_batch = x.numel() // batch_size
+        
         self.fc_layers = nn.ModuleList()
         in_features = self.flattened_size_per_element_in_batch
         
         for fc_units in fc_layers:
-            print(in_features, fc_units)
             self.fc_layers.append(nn.Linear(in_features, fc_units))
             in_features = fc_units
         
@@ -111,6 +113,9 @@ class CNNGenerator(nn.Module):
         self.flatten = nn.Flatten()
 
     def forward(self, x):
+        """
+        Forward pass for the CNNGenerator.
+        """
         for conv in self.conv_layers:
             x = F.relu(conv(x))
             if self.use_pooling:
