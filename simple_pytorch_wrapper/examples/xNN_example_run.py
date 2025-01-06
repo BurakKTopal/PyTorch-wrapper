@@ -9,7 +9,7 @@ def xNN_example_run(learning_rate, batch_size, epochs, plot, network, network_ty
 
     wrapper = PytorchWrapper(X, Y)  
     
-    wrapper.upload_pyTorch_network(network) 
+    wrapper.upload_pytorch_network(network) 
 
     wrapper.setup_training(batch_size=batch_size, learning_rate=learning_rate, epochs=epochs)
 

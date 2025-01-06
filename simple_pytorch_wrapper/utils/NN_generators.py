@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from simple_pytorch_wrapper.utils.display_warning import display_warning
+from simple_pytorch_wrapper.utils.warnings import display_warning
 
 class FNNGenerator(nn.Module):
     """
@@ -50,7 +50,7 @@ class CNNGenerator(nn.Module):
     Dynamic CNN class to construct convolutional layers and fully connected layers
     based on input configurations.
     """
-    def __init__(self, input_channels, conv_layers, fc_layers, output_size, batch_size, image_height, image_width, seed=None, use_pooling=False):
+    def __init__(self, input_channels, conv_layers, fc_layers, output_size, batch_size, image_height, image_width, use_pooling=False):
         """
         Arguments:
             input_channels (int): Number of input channels.
@@ -62,13 +62,10 @@ class CNNGenerator(nn.Module):
             batch_size (int): The size of the batch to be processed at once.
             image_height (int): Height of the input image.
             image_width (int): Width of the input image.
-            seed (int, optional): Random seed for reproducibility.
             use_pooling (bool): Whether to use MaxPool2d after each conv layer. The kernel size is fixed at (2, 2).
         """
         super(CNNGenerator, self).__init__()
-        
-        if not seed:
-            display_warning("__init__() CNNGenerator", "You have not chosen a seed, the CNN network will be initialized randomly.")
+        display_warning("__init__() CNNGenerator", "If you have used set_seed() to set the seed, make sure this is happening before instantiating the network to ensure reproducibility.")
         self.batch_size = batch_size
         self.use_pooling = use_pooling
         self.flattened_size_per_element_in_batch = None
