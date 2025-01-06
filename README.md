@@ -35,7 +35,7 @@ def main():
     )
     
     # Upload python network to wrapper
-    wrapper.upload_pyTorch_network(network) 
+    wrapper.upload_pytorch_network(network) 
 
     # Training
     wrapper.setup_training(batch_size=32, learning_rate=0.001, epochs=10)
@@ -77,7 +77,10 @@ network = CNNGenerator(
                 use_pooling: bool = False
             )
 ```
-The ´image_height´ and ´image_width´ are necessary to get the dimensionality of the forward layers in the CNN right.
+The `image_height` and `image_width`are necessary to get the dimensionality of the forward layers in the CNN right.
+
+## Turning off warnings 
+There has been implemented several warnings to ensure proper use. To turn off these warnings, place `suppress_warnings()` at the top of your code.
 
 ## Example runs
 It can be hard to know the power of a tool, without having a solid example. By calling `FNN_example_run()` with the training params as function arguments, you get a run on the example data set for a FNN architecture. The `CNN_example_run()` does it with a CNN architecture.

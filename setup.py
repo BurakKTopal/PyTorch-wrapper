@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="simple_pytorch_wrapper", 
-    version="0.0.4",
+    version="0.0.5",
     author="Burakktopal",
     description="A lightweight PyTorch wrapper for fast and easy neural network training and evaluation.",
     long_description=long_description,
@@ -26,7 +26,6 @@ setup(
         "torch>=2.0.0",
         "numpy>=1.21.0",
         "matplotlib>=3.5.0",
-        "ipython>=7.0.0",
         "setuptools>=42.0.0"
     ],
 )

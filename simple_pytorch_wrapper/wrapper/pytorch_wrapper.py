@@ -4,22 +4,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
-from IPython.display import clear_output
 from simple_pytorch_wrapper.utils.network_types import NetworkType
-from simple_pytorch_wrapper.utils.display_warning import display_warning
+from simple_pytorch_wrapper.utils.warnings import display_warning
 
 
 class PytorchWrapper():
     """
     This class serves as a wrapper for the general structure for the digit recoginition assignment.
-    By the use of upload_pyTorch_network(), which provides a 'gateway' to setup any neural network and train it with abstracted commands
+    By the use of upload_pytorch_network(), which provides a 'gateway' to setup any neural network and train it with abstracted commands
     Whether it is a regular neural network, or a CNN, the class won't need extra adaptations (hence in that sense it is a 'wrapper')
     Note that this is in the assumption that the data (X, Y) was initialized conform to 
-    the neural network given in upload_pyTorch_network(). The `classification` variable should be true (default) if the neural network
+    the neural network given in upload_pytorch_network(). The `classification` variable should be true (default) if the neural network
     is used for classification, and false if it is used for regression. 
     """
     def __init__(self, X, Y, classification = True):
         self.classification = classification
+        if not classification:
+            display_warning("__init__() PytorchWrapper", "No accuracy calculations will be performed, as the network is used for regression.")
         self.X = X
         self.Y = Y
         self.train_data = None
@@ -31,10 +32,9 @@ class PytorchWrapper():
         self.learning_rate = None
         self.epochs = None
         self.loss_function = None
-        self.batch_L2 = []
-        self.train_L2 = []
-        self.test_L2 = []
-        self.pyTorch_network = None
+        self.avg_train_loss = []
+        self.avg_test_loss = []
+        self.pytorch_network = None
         self.l_accuracy = []
         self.cpu_cycles = []
 
@@ -83,7 +83,7 @@ class PytorchWrapper():
         if reset_training:
             # Reset any training data from the previous iterations, option available in case we want to continue from last training
             self.reset_training() 
-        self.pyTorch_network.parameters()
+        self.pytorch_network.parameters()
         self.epochs = epochs
         self.learning_rate = learning_rate
         self.batch_size = batch_size
@@ -91,7 +91,7 @@ class PytorchWrapper():
         self.loader = torch.utils.data.DataLoader(self.train_data, batch_size=batch_size, shuffle=True)
 
         # Setting up the SGD optimizer and give feed parameters of network.
-        self.optimizer = torch.optim.SGD(self.pyTorch_network.parameters(), lr=learning_rate)
+        self.optimizer = torch.optim.SGD(self.pytorch_network.parameters(), lr=learning_rate)
         
         # Setting up the loss function
         if loss_function == 'LSE':
@@ -118,11 +118,11 @@ class PytorchWrapper():
         self.train_data, self.test_data = torch.utils.data.random_split(dataset, [train_size, test_size])
         return self.train_data, self.test_data
     
-    def reset_pyTorch_network_params(self):
+    def reset_pytorch_network_params(self):
         """
-        Resets the params of the pyTorch network to start clean off
+        Resets the params of the pytorch network to start clean off
         """
-        for m in self.pyTorch_network.children():
+        for m in self.pytorch_network.children():
             if hasattr(m, 'reset_parameters'):
                 m.reset_parameters()
         return
@@ -140,7 +140,7 @@ class PytorchWrapper():
         correct = 0
         number_of_nans = 0 
         for index in range(len(Ytest)):
-            self.pyTorch_network.eval() 
+            self.pytorch_network.eval() 
             y_pred = self.predict(Xtest[index])
 
             if self.contains_nan(y_pred, f"y_pred{index}"): 
@@ -162,12 +162,12 @@ class PytorchWrapper():
                 correct +=1
         return round(correct/len(Ytest), 2)*100
 
-    def upload_pyTorch_network(self, network):
+    def upload_pytorch_network(self, network):
         """
         IMPORTANT: this function serves as a sort of 'gateway', providing the wrapper the (PyTorch)
         network that it will uses to train
         """
-        self.pyTorch_network = network
+        self.pytorch_network = network
         return
     
 
@@ -175,20 +175,21 @@ class PytorchWrapper():
         """
         Stands in for the training of the network in one epoch.
         """
-        self.pyTorch_network.train()
+        batch_loss = []
+        self.pytorch_network.train()
         for inputs, targets in self.loader:
             self.optimizer.zero_grad()
             outputs = self.predict(inputs)
             loss = self.loss_function(outputs, targets)
-            self.batch_L2.append(loss.item() / self.batch_size)
+            batch_loss.append(loss.item() / self.batch_size)
             loss.backward()
             self.optimizer.step()
 
-        self.pyTorch_network.eval()
+        self.pytorch_network.eval()
 
         # Calculate and store the average training loss
-        average_train_loss = np.mean(self.batch_L2[-len(self.loader):])
-        self.train_L2.append(average_train_loss) if not self.contains_nan(average_train_loss, "average_train_loss") else None
+        average_train_loss = np.mean(batch_loss)
+        self.avg_train_loss.append(average_train_loss) if not self.contains_nan(average_train_loss, "average_train_loss") else None
 
         # Evaluate the model on the test data
         test_inputs, test_targets = self.test_data[:]
@@ -197,7 +198,7 @@ class PytorchWrapper():
         # Compute the average test loss
         average_test_loss = self.loss_function(test_outputs, test_targets) / len(self.test_data) 
         
-        self.test_L2.append(average_test_loss.item()) if not self.contains_nan(average_test_loss, 'average_test_loss') else None
+        self.avg_test_loss.append(average_test_loss.item()) if not self.contains_nan(average_test_loss, 'average_test_loss') else None
         
 
     def train_network(self, plot=False):
@@ -223,22 +224,20 @@ class PytorchWrapper():
         2. Accuracy over epochs
         3. CPU cycle time per epoch
         Only displays the figures if the corresponding data is available/non-empty.
-        """
-        clear_output(wait=True)
-        
+        """        
         # Figure 1: Losses
-        if not len(self.test_L2) == 0:
+        if not len(self.avg_test_loss) == 0:
             _, ax1 = plt.subplots(figsize=(10, 4))
             ax1.set_yscale('log')
-            ax1.plot(self.train_L2, label="training loss")
-            ax1.plot(self.test_L2, label="testing loss")
+            ax1.plot(self.avg_train_loss, label="training loss")
+            ax1.plot(self.avg_test_loss, label="testing loss")
             ax1.set_xlabel('Epoch')
             ax1.set_ylabel('Loss')
             ax1.legend()
             ax1.set_title('Loss Metrics')
             x_anchor = 0.5 * ax1.get_xlim()[0] + 0.5 * ax1.get_xlim()[1]
             y_anchor = 10**(0.2*math.log10(ax1.get_ylim()[0]) + 0.8*math.log10(ax1.get_ylim()[1]))
-            ax1.text(x_anchor, y_anchor, f"Test loss: {self.test_L2[-1]:.2e}", ha='center', fontsize=12)
+            ax1.text(x_anchor, y_anchor, f"Test loss: {self.avg_test_loss[-1]:.2e}", ha='center', fontsize=12)
             plt.tight_layout()
         
         # Figure 2: Accuracy
@@ -271,16 +270,15 @@ class PytorchWrapper():
         """
         Predicts the output of the network for a given input.
         """
-        return self.pyTorch_network(x)
+        return self.pytorch_network(x)
     
     def reset_training(self):
         """
         This will reset any training done, and serves to give clean plots when trying to train again.
         """
-        self.batch_L2 = []
-        self.train_L2 = []
-        self.test_L2 = []
-        self.reset_pyTorch_network_params()
+        self.avg_train_loss = []
+        self.avg_test_loss = []
+        self.reset_pytorch_network_params()
         self.optimizer = None
         self.loader = None
         self.l_accuracy = []
