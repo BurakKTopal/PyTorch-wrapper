@@ -1,9 +1,10 @@
 from simple_pytorch_wrapper.utils.NN_generators import  CNNGenerator
 from simple_pytorch_wrapper.examples.xNN_example_run import xNN_example_run
 from simple_pytorch_wrapper.utils.network_types import NetworkType
-
+from simple_pytorch_wrapper.utils.warnings import suppress_warnings
 
 def CNN_example_run(learning_rate, batch_size, epochs, plot):
+    suppress_warnings()
     network = CNNGenerator(
     input_channels=1,
     conv_layers=[{

@@ -1,5 +1,6 @@
 from simple_pytorch_wrapper.examples.load_example_dataset import load_language_digit_example_dataset
 from simple_pytorch_wrapper.wrapper.pytorch_wrapper import PytorchWrapper
+from simple_pytorch_wrapper.utils.warnings import enable_warnings
 
 def xNN_example_run(learning_rate, batch_size, epochs, plot, network, network_type, seed=None):
 
@@ -19,5 +20,7 @@ def xNN_example_run(learning_rate, batch_size, epochs, plot, network, network_ty
 
     accuracy = wrapper.calculate_accuracy()
     print(f"The final accuracy is: {accuracy}%")
-    
+
+    enable_warnings()
+
     return

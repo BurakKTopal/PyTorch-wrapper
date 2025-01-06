@@ -219,49 +219,59 @@ class PytorchWrapper():
     
     def visualize(self):
         """
-        Visualization with three separate figures showing:
-        1. Loss metrics (batch, training, and testing loss)
-        2. Accuracy over epochs
-        3. CPU cycle time per epoch
-        Only displays the figures if the corresponding data is available/non-empty.
-        """        
-        # Figure 1: Losses
-        if not len(self.avg_test_loss) == 0:
-            _, ax1 = plt.subplots(figsize=(10, 4))
-            ax1.set_yscale('log')
-            ax1.plot(self.avg_train_loss, label="training loss")
-            ax1.plot(self.avg_test_loss, label="testing loss")
-            ax1.set_xlabel('Epoch')
-            ax1.set_ylabel('Loss')
-            ax1.legend()
-            ax1.set_title('Loss Metrics')
-            x_anchor = 0.5 * ax1.get_xlim()[0] + 0.5 * ax1.get_xlim()[1]
-            y_anchor = 10**(0.2*math.log10(ax1.get_ylim()[0]) + 0.8*math.log10(ax1.get_ylim()[1]))
-            ax1.text(x_anchor, y_anchor, f"Test loss: {self.avg_test_loss[-1]:.2e}", ha='center', fontsize=12)
+        Enhanced Visualization with cleaner layouts and more modern plots.
+        Shows:
+        1. Loss metrics (training and testing loss).
+        2. Accuracy over epochs.
+        3. CPU cycle time per epoch.
+        """
+
+        if self.avg_train_loss and self.avg_test_loss:
+            _, ax = plt.subplots(figsize=(8, 6))
+            ax.plot(self.avg_train_loss, label="Training Loss", color='blue', linewidth=2)
+            ax.plot(self.avg_test_loss, label="Test Loss", color='red', linestyle='--', linewidth=2)
+
+            ax.set_title('Training vs Test Loss', fontsize=16)
+            ax.set_xlabel('Epochs', fontsize=12)
+            ax.set_ylabel('Loss (log scale)', fontsize=12)
+            ax.set_yscale('log') 
+            ax.legend(fontsize=12)
+
+            ax.text(0.5, 0.95, f"Test Loss: {self.avg_test_loss[-1]:.2e}", 
+                    transform=ax.transAxes, fontsize=12, color='red', ha='center')
             plt.tight_layout()
-        
-        # Figure 2: Accuracy
-        if not len(self.l_accuracy) == 0:
-            _, ax2 = plt.subplots(figsize=(10, 4))
-            ax2.plot(self.l_accuracy, 'g-', label='Accuracy')
-            ax2.set_title('Accuracy over Epochs')
-            ax2.set_ylabel('Accuracy (%)')
-            ax2.set_xlabel('Epoch')
-            ax2.grid(True)
-            ax2.text(0.02, 0.95, f"Current accuracy: {self.l_accuracy[-1]:.2f}%", 
-                    transform=ax2.transAxes, fontsize=12)
+
+        if self.l_accuracy:
+            _, ax = plt.subplots(figsize=(8, 6))
+            ax.plot(self.l_accuracy, label="Accuracy", color='green', marker='o', markersize=6, linewidth=2)
+
+            ax.set_title('Model Accuracy Over Epochs', fontsize=16)
+            ax.set_xlabel('Epochs', fontsize=12)
+            ax.set_ylabel('Accuracy (%)', fontsize=12)
+            ax.set_ylim([0, 100])
+            ax.legend(fontsize=12)
+
+            ax.text(0.02, 0.95, f"Accuracy: {self.l_accuracy[-1]:.2f}%", 
+                    transform=ax.transAxes, fontsize=14, color='green')
             plt.tight_layout()
-        
-        # Figure 3: CPU Cycles
-        if not len(self.cpu_cycles) == 0:
-            _, ax3 = plt.subplots(figsize=(10, 4))
-            ax3.plot(self.cpu_cycles, 'r-', label='CPU Cycles')
-            ax3.set_title('CPU Cycles per Epoch')
-            ax3.set_ylabel('CPU Cycles (ms)')
-            ax3.set_xlabel('Epoch')
-            ax3.grid(True)
-            ax3.text(0.02, 0.95, f"Last epoch cycles: {self.cpu_cycles[-1]:,} ms", 
-                    transform=ax3.transAxes, fontsize=12)
+
+        if self.cpu_cycles:
+            total_cpu_time = np.sum(self.cpu_cycles)  # Calculate the total CPU cycles
+
+            _, ax = plt.subplots(figsize=(8, 6))
+            ax.plot(self.cpu_cycles, label="CPU Cycles", color='darkblue', linestyle='-', linewidth=2)
+
+            ax.set_title('CPU Time Per Epoch', fontsize=16)
+            ax.set_xlabel('Epochs', fontsize=12)
+            ax.set_ylabel('CPU Cycles (ms)', fontsize=12)
+            ax.legend(fontsize=12)
+            ax.set_ylim([np.min(self.cpu_cycles)//1.2, np.max(self.cpu_cycles)*1.2])
+
+            ax.text(0.98, 0.98, f"Total CPU Time: {total_cpu_time/1000:,.0f} s", 
+                    transform=ax.transAxes, fontsize=14, color='darkblue', ha='right', va='top')
+
+            ax.text(0.02, 0.95, f"Last Epoch: {self.cpu_cycles[-1]:,} ms", 
+                    transform=ax.transAxes, fontsize=14, color='darkblue')
             plt.tight_layout()
 
         plt.show()

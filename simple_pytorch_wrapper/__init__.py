@@ -4,7 +4,7 @@ A lightweight PyTorch wrapper for fast and easy neural network training and eval
 """
 
 # Metadata
-__version__ = "0.0.5"
+__version__ = "0.0.6"
 __author__ = "Burakktopal"
 __description__ = "A lightweight PyTorch wrapper for fast and easy neural network training and evaluation."
 
@@ -21,7 +21,8 @@ from .utils import (
     load_data_from_numpy_files,
     NetworkType,
     display_warning,
-    suppress_warnings
+    suppress_warnings, 
+    enable_warnings
 )
 from .wrapper import PytorchWrapper
 

@@ -8,6 +8,14 @@ def suppress_warnings():
     WARNING_ON = False  # Set the flag to False to disable warnings
     return
 
+def enable_warnings():
+    """
+    Enables the display of warning messages.
+    """
+    global WARNING_ON
+    WARNING_ON = True
+    return 
+
 def display_warning(keyword, message):
     """
     Display a warning message to the user.
